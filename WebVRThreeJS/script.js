@@ -6,6 +6,8 @@ var raycaster, intersected = [];
 var tempMatrix = new THREE.Matrix4();
 
 var group;
+var loader;
+var textureLoader;
 
 init();
 animate();
@@ -54,40 +56,40 @@ function init() {
 		new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
 	];
 
-	for ( var i = 0; i < 50; i ++ ) {
-
-		var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-		var material = new THREE.MeshStandardMaterial( {
-			color: Math.random() * 0xffffff,
-			roughness: 0.7,
-			metalness: 0.0
-		} );
-
-		var object = new THREE.Mesh( geometry, material );
-
-		object.position.x = Math.random() * 4 - 2;
-		object.position.y = Math.random() * 2;
-		object.position.z = Math.random() * 4 - 2;
-
-		object.rotation.x = Math.random() * 2 * Math.PI;
-		object.rotation.y = Math.random() * 2 * Math.PI;
-		object.rotation.z = Math.random() * 2 * Math.PI;
-
-		object.scale.setScalar( Math.random() + 0.5 );
-
-		object.castShadow = true;
-		object.receiveShadow = true;
-
-		group.add( object );
-
-	}
-
-	// var loader = new THREE.ObjectLoader();
-	// var textureLoader = new THREE.TextureLoader();
+	// for ( var i = 0; i < 50; i ++ ) {
 	//
-	// loader.load('/assets/models/head/lee-perry-smith-head-scan.obj', function (object) {
-	// 	var colorMap = textureLoader.load('/assets/models/head/Face_Color.jpg');
-	// 	var bumpMap = textureLoader.load('/assets/models/head/Face_Disp.jpg');
+	// 	var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+	// 	var material = new THREE.MeshStandardMaterial( {
+	// 		color: Math.random() * 0xffffff,
+	// 		roughness: 0.7,
+	// 		metalness: 0.0
+	// 	} );
+	//
+	// 	var object = new THREE.Mesh( geometry, material );
+	//
+	// 	object.position.x = Math.random() * 4 - 2;
+	// 	object.position.y = Math.random() * 2;
+	// 	object.position.z = Math.random() * 4 - 2;
+	//
+	// 	object.rotation.x = Math.random() * 2 * Math.PI;
+	// 	object.rotation.y = Math.random() * 2 * Math.PI;
+	// 	object.rotation.z = Math.random() * 2 * Math.PI;
+	//
+	// 	object.scale.setScalar( Math.random() + 0.5 );
+	//
+	// 	object.castShadow = true;
+	// 	object.receiveShadow = true;
+	//
+	// 	group.add( object );
+	//
+	// }
+
+	loader = new THREE.OBJLoader();
+	textureLoader = new THREE.TextureLoader();
+
+	loader.load('./Assets/Head/lee-perry-smith-head-scan.obj', function (object) {
+	// 	var colorMap = textureLoader.load('./Assets/Head/Face_Color.jpg');
+	// 	var bumpMap = textureLoader.load('./Assets/Head/Face_Disp.jpg');
 	// 	var faceMaterial = getMaterial('standard', 'rgb(255, 255, 255)');
 	//
 	// 	object.traverse(function(child) {
@@ -110,9 +112,9 @@ function init() {
 	// 	object.scale.z = 20;
 	//
 	// 	object.position.z = 0;
-	// 	object.position.y = -2;
+	// 	object.position.y = 0;
 	// 	scene.add(object);
-	// });
+	});
 
 	//
 
@@ -257,6 +259,33 @@ function cleanIntersected() {
 
 	}
 
+}
+
+function getMaterial(type, color) {
+	var selectedMaterial;
+	var materialOptions = {
+		color: color === undefined ? 'rgb(255, 255, 255)' : color,
+	};
+
+	switch (type) {
+		case 'basic':
+			selectedMaterial = new THREE.MeshBasicMaterial(materialOptions);
+			break;
+		case 'lambert':
+			selectedMaterial = new THREE.MeshLambertMaterial(materialOptions);
+			break;
+		case 'phong':
+			selectedMaterial = new THREE.MeshPhongMaterial(materialOptions);
+			break;
+		case 'standard':
+			selectedMaterial = new THREE.MeshStandardMaterial(materialOptions);
+			break;
+		default:
+			selectedMaterial = new THREE.MeshBasicMaterial(materialOptions);
+			break;
+	}
+
+	return selectedMaterial;
 }
 
 //
