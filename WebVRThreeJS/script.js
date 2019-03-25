@@ -71,15 +71,9 @@ function init() {
 			}
 		} );
 
-<<<<<<< HEAD
 		object.scale.x = 20;
 		object.scale.y = 20;
 		object.scale.z = 20;
-=======
-		object.scale.x = 1;
-		object.scale.y = 1;
-		object.scale.z = 1;
->>>>>>> 9bb8fcd2ef72f2cada9a6318e6aea627195047df
 
 		object.position.z = 0;
 		object.position.y = 0;
