@@ -8,7 +8,6 @@ var tempMatrix = new THREE.Matrix4();
 var group;
 var loader;
 var textureLoader;
-var testing = new THREE.Geometry();
 
 init();
 animate();
@@ -49,84 +48,35 @@ function init() {
 	group = new THREE.Group();
 	scene.add( group );
 
-	var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
-	var material = new THREE.MeshStandardMaterial( {
-		color: Math.random() * 0xffffff,
-		roughness: 0.7,
-		metalness: 0.0
-	} );
-	var cube = new THREE.Mesh( geometry, material );
-	cube.name = "cube";
-	cube.position.z = 0;
-	cube.position.y = 0;
-	cube.position.x = 0;
-	group.add(cube);
-	var cube1 = new THREE.Mesh( geometry, material );
-	cube1.position.z = 0;
-	cube1.position.y = 0;
-	cube1.position.x = -1;
-	group.add(cube1);
-	var cube2 = new THREE.Mesh( geometry, material );
-	cube2.position.z = 0;
-	cube2.position.y = 0;
-	cube2.position.x = 1;
-	group.add(cube2);
-	var cube3 = new THREE.Mesh( geometry, material );
-	cube3.position.z = 0;
-	cube3.position.y = 1;
-	cube3.position.x = 0;
-	group.add(cube3);
-
 	loader = new THREE.OBJLoader();
 	textureLoader = new THREE.TextureLoader();
-//for (var i = 0; i < 4; i++) {
-	loader.load('./Assets/Head/lee-perry-smith-head-scan.obj', function (object) {
-		var colorMap = textureLoader.load('./Assets/Head/Face_Color.jpg');
-		var bumpMap = textureLoader.load('./Assets/Head/Face_Disp.jpg');
-		var faceMaterial = getMaterial('standard', 'rgb(255, 255, 255)');
 
-		object.traverse(function(child) {
-			if (child.name == 'Plane') {
-				child.visible = false;
-			}
-			if (child.name == 'Infinite') {
-				child.material = faceMaterial;
-				faceMaterial.roughness = 0.875;
-				faceMaterial.map = colorMap;
-				faceMaterial.roughnessMap = bumpMap;
-				faceMaterial.metalness = 0.1;
-				faceMaterial.bumpScale = 0.175;
-			}
+	var geometries = [
+		new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
+		new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
+		new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
+		new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
+		new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
+	];
+	for ( var i = 0; i < 50; i ++ ) {
+		var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+		var material = new THREE.MeshStandardMaterial( {
+			color: Math.random() * 0xffffff,
+			roughness: 0.7,
+			metalness: 0.0
 		} );
-
-		/*object.scale.x = 20;
-		object.scale.y = 20;
-		object.scale.z = 20;
-
-		object.position.z = 0;
-		object.position.y = 0;
-		scene.add(object);*/
-		object.name = "Face";
-		object.scale.x = 10;
-		object.scale.y = 10;
-		object.scale.z = 10;
-
-		object.position.z = -3;
-		object.position.y = -0.1;
-		object.position.x = 0;
-		//object.bbox = new THREE.Box3().setFromObject(object);
-		//testing.vertices.push(object.vertices);
-		//testing.faces.push(object.faces);
-		group.add(object);
-		object.parent = cube;
-		//var secondHead = new THREE.Mesh(testing, faceMaterial);
-		//scene.add(secondHead);
-	});
-//}
-
-//group.children[0].children.add(group.children[1]);
-
-console.log(group);
+		var object = new THREE.Mesh( geometry, material );
+		object.position.x = Math.random() * 4 - 2;
+		object.position.y = Math.random() * 2;
+		object.position.z = Math.random() * 4 - 2;
+		object.rotation.x = Math.random() * 2 * Math.PI;
+		object.rotation.y = Math.random() * 2 * Math.PI;
+		object.rotation.z = Math.random() * 2 * Math.PI;
+		object.scale.setScalar( Math.random() + 0.5 );
+		object.castShadow = true;
+		object.receiveShadow = true;
+		group.add( object );
+	}
 
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
