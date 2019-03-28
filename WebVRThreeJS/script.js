@@ -10,6 +10,8 @@ var loader;
 var textureLoader;
 
 init();
+generateRoom();
+generateBucket(new THREE.Vector3(1.5,1,-1));
 animate();
 
 function init() {
@@ -21,17 +23,6 @@ function init() {
 	scene.background = new THREE.Color( 0x808080 );
 
 	camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10 );
-
-	var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-	var material = new THREE.MeshStandardMaterial( {
-		color: 0xeeeeee,
-		roughness: 1.0,
-		metalness: 0.0
-	} );
-	var floor = new THREE.Mesh( geometry, material );
-	floor.rotation.x = - Math.PI / 2;
-	floor.receiveShadow = true;
-	scene.add( floor );
 
 	scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
@@ -51,6 +42,66 @@ function init() {
 	loader = new THREE.OBJLoader();
 	textureLoader = new THREE.TextureLoader();
 
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.gammaInput = true;
+	renderer.gammaOutput = true;
+	renderer.shadowMap.enabled = true;
+	renderer.vr.enabled = true;
+	container.appendChild( renderer.domElement );
+
+	addControllers(controller1,controller2,scene);
+
+	document.body.appendChild( WEBVR.createButton( renderer ) );
+	raycaster = new THREE.Raycaster();
+	window.addEventListener( 'resize', onWindowResize, false );
+}
+
+function generateBucket(vector3){
+	loader.load('./Assets/Bucket/Bucket.obj', function(object){
+		var colorMap = textureLoader.load('./Assets/Bucket/Bucket_Base_color.png');
+		var normalMap = textureLoader.load('./Assets/Bucket/Bucket_Normal.png');
+		var roughnessMap = textureLoader.load('./Assets/Bucket/Bucket_Roughness.png');
+		var material = getMaterial('standard','rgb(255,255,255)');
+
+		object.traverse(function(child){
+			child.material = material;
+			material.roughnessMap = roughnessMap;
+			material.map = colorMap;
+			material.normalMap = normalMap;
+		});
+		object.name = "Bucket";
+		object.scale.x = 5;
+		object.scale.y = 5;
+		object.scale.z = 5;
+		object.position.x = vector3.x;
+		object.position.y = vector3.y;
+		object.position.z = vector3.z;
+		group.add(object);
+	});
+}
+
+function generateRoom(){
+	loader.load('./Assets/VRmeer\ Room/VRmeer.obj', function(object){
+		var colorMap = textureLoader.load('./Assets/Texture/Lava.jpg');
+		var material = getMaterial('standard','rgb(255,255,255)');
+
+		object.traverse(function(child){
+			child.material = material;
+			material.map = colorMap;
+		});
+		object.name = "Room";
+		object.scale.x = 0.01;
+		object.scale.y = 0.01;
+		object.scale.z = 0.01;
+		object.position.y = 0;
+		object.position.x = -1;
+		scene.add(object);
+	});
+}
+
+function generateHead(vector3){
 	loader.load('./Assets/Head/lee-perry-smith-head-scan.obj', function (object) {
 		var colorMap = textureLoader.load('./Assets/Head/Face_Color.jpg');
 		var bumpMap = textureLoader.load('./Assets/Head/Face_Disp.jpg');
@@ -68,45 +119,30 @@ function init() {
 				faceMaterial.metalness = 0.1;
 				faceMaterial.bumpScale = 0.175;
 			}
-		} );
+		});
 		object.name = "Face";
 		object.scale.x = 10;
 		object.scale.y = 10;
 		object.scale.z = 10;
-
-		object.position.z = -3;
-		object.position.y = -0.1;
-		object.position.x = 0
+		object.position.x = vector3.x;
+		object.position.y = vector3.y;
+		object.position.z = vector3.z;
 		group.add(object);
-	});
-
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.gammaInput = true;
-	renderer.gammaOutput = true;
-	renderer.shadowMap.enabled = true;
-	renderer.vr.enabled = true;
-	container.appendChild( renderer.domElement );
-
-	addControllers(controller1,controller2,scene);
-
-	document.body.appendChild( WEBVR.createButton( renderer ) );
-	raycaster = new THREE.Raycaster();
-	window.addEventListener( 'resize', onWindowResize, false );
+		});
 }
 
-function rotate(name){
-	var _name = name;
-	var _object = scene.getObjectByName(_name);
-	console.log(_object);
-	_object.rotation.x += 0.1;
-	_object.rotation.y += 0.1;
-	_object.rotation.z += 0.1;
+function loadTest(){
+	var xLimit = 3;
+	var yLimit = 3;
+
+	for(var i=0; i<xLimit;i++){
+		for(var j=0;j<yLimit;j++){
+			generateHead(new THREE.Vector3(-xLimit/1.5+j*2,-yLimit/2+i*1.5,-3));
+		}
+	}
 }
 
 function animate() {
-	rotate("Face");
 	renderer.setAnimationLoop( render );
 }
 
