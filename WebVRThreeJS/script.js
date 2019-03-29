@@ -57,12 +57,19 @@ function init() {
 	} );
 	var cube = new THREE.Mesh( geometry, material );
 	cube.name = "cube";
-	cube.position.z = 0;
+	cube.position.z = -5;
 	cube.position.y = 0;
 	cube.position.x = 0;
+	var wireframe = new THREE.WireframeGeometry(geometry);
+	var line = new THREE.LineSegments( wireframe );
+	line.material.depthTest = false;
+	line.material.opacity = 0.25;
+	line.material.transparent = true;
+
+	group.add( line );
 	group.add(cube);
 	var cube1 = new THREE.Mesh( geometry, material );
-	cube1.position.z = 0;
+	cube1.position.z = 1;
 	cube1.position.y = 0;
 	cube1.position.x = -1;
 	group.add(cube1);
